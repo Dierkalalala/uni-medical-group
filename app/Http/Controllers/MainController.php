@@ -53,7 +53,7 @@ class MainController extends Controller
         $patientName = $request->name;
         $patientAddress = $request->address;
         $index = Box::find($request->index);
-        $clinics = Nursery::get();
+        $clinics = Nursery::where('type_id', $request->type)->get();
         $lat =($index->getCoordinates()[0]['lat']);
         $lng =($index->getCoordinates()[0]['lng']);
         foreach($clinics as $clinic) {
