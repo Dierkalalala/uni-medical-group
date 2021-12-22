@@ -54,7 +54,7 @@
 
                 <div class="mb-3">
                     <label for="address" class="form-label">Clinic type</label>
-                    <select multiple name="type_id[]" required class="form-select" aria-label="Default select example">
+                    <select style="height: 240px" multiple name="type_id[]" required class="form-select" aria-label="Default select example">
                         <option value="" disabled selected>Clinic types</option>
                         @foreach($types as $type)
                             <option value="{{$type->id}}">{{$type->name}}</option>
