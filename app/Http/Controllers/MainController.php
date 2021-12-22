@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
-    private function array_sort($array, $on, $order=SORT_ASC)
+    private function array_sort($array, $on, $order = SORT_ASC)
     {
         $new_array = array();
         $sortable_array = array();
@@ -43,28 +43,46 @@ class MainController extends Controller
 
         return $new_array;
     }
-    public function main() {
+
+    public function main()
+    {
         $types = Type::get();
         $boxes = Box::get();
         return view('pages.main', compact('boxes', 'types'));
     }
 
-    public function getClinics(Request $request) {
+    public function getClinics(Request $request)
+    {
         $patientName = $request->name;
         $patientAddress = $request->address;
+        $patientDistrict = $request->district;
         $index = Box::find($request->index);
-        $clinics = Nursery::where('type_id', $request->type_id)->get();
-        $lat =($index->getCoordinates()[0]['lat']);
-        $lng =($index->getCoordinates()[0]['lng']);
-        foreach($clinics as $clinic) {
+        $clinics = Nursery::get();
+        $returningClinics = [];
+        foreach ($clinics as $clinic) {
+            foreach ($clinic->types as $type) {
+                if (in_array($type->id, $request->type_id)) {
+                    if (!in_array($clinic, $returningClinics)) {
+                        array_push($returningClinics, $clinic);
+                        continue;
+                    }
+                }
+            }
+        }
+        $clinics = $returningClinics;
+        $lat = ($index->getCoordinates()[0]['lat']);
+        $lng = ($index->getCoordinates()[0]['lng']);
+        $myCoordinates = $lat . ',' . $lng;
+        foreach ($clinics as $clinic) {
             $clinic->lat = ($clinic->getCoordinates()[0]['lat']);
             $clinic->lng = ($clinic->getCoordinates()[0]['lng']);
+            $clinic->coordinates = trim($clinic->getCoordinates()[0]['lat'] . ',' . $clinic->getCoordinates()[0]['lng']);
             $latDiff = abs($clinic->lat - $lat);
             $lngDiff = abs($clinic->lng - $lng);
             $clinic->closestIndex = $latDiff + $lngDiff;
         }
         $clinics = $this->array_sort($clinics, 'closestIndex', SORT_DESC);
-        return view('pages.clinics', compact('patientAddress', 'patientName', 'clinics'));
+        return view('pages.clinics', compact('patientAddress', 'patientName', 'clinics', 'patientDistrict', 'myCoordinates'));
     }
 
 }

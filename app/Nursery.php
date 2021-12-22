@@ -11,4 +11,8 @@ class Nursery extends Model
     use Spatial;
 
     protected $spatial = ['coordinates'];
+
+    public function types() {
+        return $this->belongsToMany(Type::class);
+}
 }
