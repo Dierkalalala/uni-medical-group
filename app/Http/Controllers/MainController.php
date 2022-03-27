@@ -46,32 +46,15 @@ class MainController extends Controller
 
     public function main()
     {
-        $types = Type::get();
-        $boxes = Box::get();
-        return view('pages.main', compact('boxes', 'types'));
+        $clinics = Nursery::get();
+        return view('pages.main', compact('clinics'));
     }
 
-    public function getClinics(Request $request)
+    public function getClinics(Request $req)
     {
-        $patientName = $request->name;
-        $patientAddress = $request->address;
-        $patientDistrict = $request->district;
-        $index = Box::find($request->index);
-        $clinics = Nursery::get();
-        $returningClinics = [];
-        foreach ($clinics as $clinic) {
-            foreach ($clinic->types as $type) {
-                if (in_array($type->id, $request->type_id)) {
-                    if (!in_array($clinic, $returningClinics)) {
-                        array_push($returningClinics, $clinic);
-                        continue;
-                    }
-                }
-            }
-        }
-        $clinics = $returningClinics;
-        $lat = ($index->getCoordinates()[0]['lat']);
-        $lng = ($index->getCoordinates()[0]['lng']);
+        $clinics = Nursery::all();
+        $lat = $req->lat;
+        $lng = $req->lng;
         $myCoordinates = $lat . ',' . $lng;
         foreach ($clinics as $clinic) {
             $clinic->lat = ($clinic->getCoordinates()[0]['lat']);
@@ -82,7 +65,7 @@ class MainController extends Controller
             $clinic->closestIndex = $latDiff + $lngDiff;
         }
         $clinics = $this->array_sort($clinics, 'closestIndex', SORT_DESC);
-        return view('pages.clinics', compact('patientAddress', 'patientName', 'clinics', 'patientDistrict', 'myCoordinates'));
+        return $clinics;
     }
 
 }
