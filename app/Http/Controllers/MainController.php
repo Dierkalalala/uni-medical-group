@@ -64,8 +64,9 @@ class MainController extends Controller
             $lngDiff = abs($clinic->lng - $lng);
             $clinic->closestIndex = $latDiff + $lngDiff;
         }
-        $clinics = $this->array_sort($clinics, 'closestIndex', SORT_DESC);
-        return $clinics;
+        $myClinics = $this->array_sort($clinics, 'closestIndex', SORT_DESC);
+
+        return $myClinics;
     }
 
 }

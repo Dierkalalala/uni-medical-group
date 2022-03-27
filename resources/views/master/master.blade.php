@@ -146,11 +146,16 @@
                         lng: geoPosition[1]
                     })
                     .then(res => {
+                        console.log(res.data);
+                        let arrayOfClinics = Object.keys(res.data).map((objectKey) => res.data[objectKey])
+                        res.data = arrayOfClinics.sort((a, b) => {
+                            return a.closestIndex - b.closestIndex
+                        })
                         var multiRoute = new ymaps.multiRouter.MultiRoute({
                             // The description of the reference points on the multi-stop route.
                             referencePoints: [
                                 [geoPosition[0], geoPosition[1]],
-                                [res.data[0].lat, res.data[0].lng],
+                                [arrayOfClinics[0].lat, arrayOfClinics[0].lng],
                             ],
                             // Routing options.
                             params: {
