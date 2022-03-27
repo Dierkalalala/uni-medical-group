@@ -46,6 +46,8 @@
         <div class="col-lg-6">
             <p class="header">Place the mark to the place where your meeting is going
                 to be conducted and we will find the closest hostel for you</p>
+
+            <p class="header">Approximate distance to closest hotel is <span class="distance"></span> km</p>
             <a href="/" class="btn btn-success mb-3">Refresh page</a>
             <div id="map" style="margin: 0 auto;"></div>
             <div id="marker"></div>
@@ -146,7 +148,6 @@
                         lng: geoPosition[1]
                     })
                     .then(res => {
-                        console.log(res.data);
                         let arrayOfClinics = Object.keys(res.data).map((objectKey) => res.data[objectKey])
                         res.data = arrayOfClinics.sort((a, b) => {
                             return a.closestIndex - b.closestIndex
@@ -168,6 +169,30 @@
                         });
 
                         map.geoObjects.add(multiRoute);
+
+                        function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+                            var R = 6371; // Radius of the earth in km
+                            var dLat = deg2rad(lat2-lat1);  // deg2rad below
+                            var dLon = deg2rad(lon2-lon1);
+                            var a =
+                                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                                Math.sin(dLon/2) * Math.sin(dLon/2)
+                            ;
+                            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                            var d = R * c; // Distance in km
+                            return d;
+                        }
+
+                        function deg2rad(deg) {
+                            return deg * (Math.PI/180)
+                        }
+
+                        const distanceMOWBKK = getDistanceFromLatLonInKm(
+                            geoPosition[0], geoPosition[1], arrayOfClinics[0].lat, arrayOfClinics[0].lng
+                        )
+
+                        document.querySelector('.distance').innerHTML = (distanceMOWBKK * 1.5).toFixed(0)
 
                     })
 
